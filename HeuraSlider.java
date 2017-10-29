@@ -12,8 +12,8 @@ import android.graphics.Rect;
  */
 
 public class HeuraSlider {
-    private int val;
-    private int bot,top;
+    private byte val;
+    private byte bot,top;
     private float r,g,b;
     String name;
     float y;
@@ -22,7 +22,7 @@ public class HeuraSlider {
 
     private float w;
 
-    public HeuraSlider(String n,int v,int bo,int to,float yy,float dyy,float rr,float gg,float bb){
+    public HeuraSlider(String n,byte v,byte bo,byte to,float yy,float dyy,float rr,float gg,float bb){
         name=n;
         val=v;
         bot=bo;
@@ -68,7 +68,7 @@ public class HeuraSlider {
             val=top;
         }
         else{
-            val=(int) (bot+(top-bot)*(mx-50+(w-100)/(top-bot)/2)/(w-100));
+            val=(byte) (bot+(top-bot)*(mx-50+(w-100)/(top-bot)/2)/(w-100));
         }
         if(val<bot){
             val=bot;
@@ -78,11 +78,11 @@ public class HeuraSlider {
         }
     }
 
-    int getVal(){
+    byte getVal(){
         return val;
     }
     void setVal(float v){
-        val=(int)v;
+        val=(byte)v;
     }
 }
 
