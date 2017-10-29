@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * The main class that manages the whole game (sets up, updates and draws everything).
@@ -33,7 +34,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private static final int STATE_HEURA_MENU=12345;     //heuraMenu (temp)
     private GameMode match;
 
-    //private int highscore; todo  //temp
+    private int highscore;    //temp
 
     private HeuraSlider[] sliders;     //heuraMenu (temp)
     private int sliderHold;     //heuraMenu (temp)
@@ -88,6 +89,22 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         sliders[ 8]=new HeuraSlider("Bullet lifetime (30)"   ,(byte)30,(byte)5,(byte)40 ,18*t,t,127,0,255);
         sliders[ 9]=new HeuraSlider("Killing bullets (1)"    ,(byte)1 ,(byte)0,(byte)1  ,20*t,t,0,255,255);
         sliders[10]=new HeuraSlider("Save/load file number"  ,(byte)1 ,(byte)1,(byte)30 ,22*t,t,255,127,0);
+        heuraGetHighscore();
+    }
+
+    void heuraGetHighscore(){
+        highscore=0;
+        try {
+            heuraLoadFile("highscore-"+sliders[0].getVal()+"-"+sliders[1].getVal()
+                    +"-"+sliders[2].getVal()+"-"+sliders[3].getVal()
+                    +"-"+sliders[4].getVal()+"-"+sliders[5].getVal()
+                    +"-"+sliders[6].getVal()+"-"+sliders[7].getVal()
+                    +"-"+sliders[8].getVal()+"-"+sliders[9].getVal());
+            highscore=heuraLoader[0]*128+heuraLoader[1];
+        } catch (IOException e) {
+
+        }
+
     }
 
     @Override
@@ -148,6 +165,18 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void update(){
         if(state==STATE_PLAYING){
             match.update();
+            if(!match.getPlayer().getAlive()) {
+                if (match.getScore() > highscore) {
+                    highscore=match.getScore();
+                    heuraLoader[0] = (byte) (highscore / 128);
+                    heuraLoader[1] = (byte) (highscore % 128);
+                    heuraSaveFile("highscore-" + sliders[0].getVal() + "-" + sliders[1].getVal()
+                            + "-" + sliders[2].getVal() + "-" + sliders[3].getVal()
+                            + "-" + sliders[4].getVal() + "-" + sliders[5].getVal()
+                            + "-" + sliders[6].getVal() + "-" + sliders[7].getVal()
+                            + "-" + sliders[8].getVal() + "-" + sliders[9].getVal());
+                }
+            }
         }
         else if(state==STATE_HEURA_MENU){
             //heuraMenu (temp)
@@ -162,11 +191,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             match.draw(canvas);
             Paint paint=new Paint();
             paint.setColor(Color.rgb(0,63,63));
-            canvas.drawRect(0,0,w,t,paint);
+            canvas.drawRect(0,0,w,t-1,paint);
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setTextSize((float)(t*5.0/7));
             paint.setColor(Color.rgb(0,255,255));
-            canvas.drawText(match.getScore()+"/"+match.getLastScore(),w/2,t/4*3,paint);
+            canvas.drawText(match.getScore()+"/"+match.getLastScore()+"/"+highscore,w/2,t/4*3,paint);
         }
         else if(state==STATE_HEURA_MENU){      //heuraMenu (temp)
 
@@ -206,6 +235,23 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
+    void heuraSaveFile(String fileName){
+        try{
+            FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            fos.write(heuraLoader);
+            fos.close();
+        }catch(Exception e){
+            //System.out.println("save failed: "+ "\n"+ e.getStackTrace());
+        }
+    }
+
+    byte[] heuraLoadFile(String fileName) throws IOException {
+        FileInputStream fis = context.openFileInput(fileName);
+        fis.read(heuraLoader,0,sliders.length);
+        fis.close();
+        return heuraLoader;
+    }
+
     void mouseDown(MotionEvent event){
         if(state==STATE_PLAYING){
             if(event.getY()>t) {
@@ -224,37 +270,28 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                     match=new GMBouncer(p);
                     match.setBulletLifetime((float)(sliders[8].getVal()/40.0));
                     state=STATE_PLAYING;
+                    heuraGetHighscore();
                 }
                 else if(event.getX()<2*w/4) {
 
-                    String FILENAME = "heuraSettings"+sliders[sliders.length-1].getVal();
+                    try {
+                        heuraLoadFile("heuraSettings"+sliders[sliders.length-1].getVal());
+                        for(int i=0;i<sliders.length-1;i++){
+                            sliders[i].setVal(heuraLoader[i]);
+                        }
+                    } catch (IOException e) {
 
-                    try{
-                        FileInputStream fis = context.openFileInput(FILENAME);
-                        fis.read(heuraLoader,0,sliders.length);
-                        fis.close();
-                    }catch(Exception e){
-                        System.out.println("load failed: "+ "\n"+ e.getStackTrace());
                     }
-                    for(int i=0;i<sliders.length-1;i++){
-                        sliders[i].setVal(heuraLoader[i]);
-                    }
+
                     System.out.println("LOAD");
                 }
                 else if(event.getX()<3*w/4){
 
-                    String FILENAME = "heuraSettings"+sliders[sliders.length-1].getVal();
+                    //String FILENAME = "heuraSettings"+sliders[sliders.length-1].getVal();
                     for(int i=0;i<sliders.length-1;i++){
                         heuraLoader[i]=(byte)sliders[i].getVal();
                     }
-
-                    try{
-                    FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                    fos.write(heuraLoader);
-                    fos.close();
-                    }catch(Exception e){
-                        System.out.println("save failed: "+ "\n"+ e.getStackTrace());
-                    }
+                    heuraSaveFile("heuraSettings"+sliders[sliders.length-1].getVal());
 
                     System.out.println("SAVE");
                 }

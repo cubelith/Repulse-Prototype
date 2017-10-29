@@ -10,6 +10,7 @@ import android.graphics.Canvas;
  */
 public interface GameObject {
 
+
     /**
      * Draws the object on a given Canvas
      *
@@ -22,4 +23,10 @@ public interface GameObject {
      * Updates the object's state by one frame
      */
     public void update();
+
+
+
+    float getVx();
+
+    float getVy();
 }

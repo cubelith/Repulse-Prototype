@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * here be javadoc
  */
 
-public class Bullet implements GameObject {
+public class Bullet implements GameObjectCircle {
 
     /**
      * Says whether the bullet actually exists
@@ -108,6 +108,8 @@ public class Bullet implements GameObject {
             }
         }
     }
+
+
 
     public float getVx() {
         return vx;

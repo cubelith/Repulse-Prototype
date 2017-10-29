@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * @author Kuba
  */
 
-public class Player implements GameObject{
+public class Player implements GameObjectCircle{
 
     private boolean alive;
     /**
@@ -36,7 +36,8 @@ public class Player implements GameObject{
     private float bulletRadius;
     private float bulletGravity;
 
-    private Bullet nextShot;
+    //private Bullet nextShot;
+    private ArrayList<Bullet> bullets;
     private boolean wallsKill,bulletsKill;
 
     private int shotCounter;
@@ -58,12 +59,18 @@ public class Player implements GameObject{
         shotCounter=0;
     }
 
+    public void setShotParams(ArrayList<Bullet> bullets,float recoilSpeed,float bulletSpeed,float bulletRadius,float bulletGravity){
+        this.recoilSpeed=recoilSpeed;
+        this.bulletSpeed=bulletSpeed;
+        this.bulletRadius=bulletRadius;
+        this.bulletGravity=bulletGravity;
+        this.bullets=bullets;
+    }
     public void setShotParams(float recoilSpeed,float bulletSpeed,float bulletRadius,float bulletGravity){
         this.recoilSpeed=recoilSpeed;
         this.bulletSpeed=bulletSpeed;
         this.bulletRadius=bulletRadius;
         this.bulletGravity=bulletGravity;
-        nextShot=null;
     }
 
 
@@ -93,14 +100,14 @@ public class Player implements GameObject{
      * Applies all kinds of effects, such as gravity or bullet collisions
      * Also processes how the player affects the world
      * Use before <code>update()</code>
-     * @param bullets   The list of bullets in the game
      */
-    public void affect(ArrayList<Bullet> bullets){
+    public void affect() {
         vy += gravity;
 
-        if(bulletsKill) {
+        if (bulletsKill) {
             for (Bullet bullet : bullets) {
-                if (collide(bullet) == 0) {
+                int col=(int)DataBank.collide(this,bullet);
+                if (col == 0) {
                     if (!bullet.getInPlayer()) {
                         alive = false;
                     }
@@ -109,10 +116,10 @@ public class Player implements GameObject{
                 }
             }
         }
-        if(nextShot!=null){
-            bullets.add(nextShot);
-            nextShot=null;
-        }
+//        if(nextShot!=null){
+//            bullets.add(nextShot);
+//            nextShot=null;
+//        }
     }
 
     /**
@@ -124,7 +131,7 @@ public class Player implements GameObject{
      */
     /// Attention - heuristic for now, does not include bouncing off walls
     /// The javadoc sucks too
-    private int collide(Bullet bullet){
+    /*private int collide(Bullet bullet){
         float dr=radius+bullet.getRadius();
         float dx=x-bullet.getX();
         float dy=y-bullet.getY();
@@ -154,7 +161,7 @@ public class Player implements GameObject{
         }
         //this should be unreachable anyway
         return -1;
-    }
+    }*/
 
     /**
      * Updates the player's state by one frame
@@ -194,6 +201,31 @@ public class Player implements GameObject{
         cooldown--;
     }
 
+
+    public float getRadius() {
+        return radius;
+    }
+
+
+    public float getX() {
+        return x;
+    }
+
+
+    public float getY() {
+        return y;
+    }
+
+    @Override
+    public float getVx() {
+        return vx;
+    }
+
+    @Override
+    public float getVy() {
+        return vy;
+    }
+
     public void mouseDown(MotionEvent event) {
         if(cooldown<=0){
             shoot(event.getX(),event.getY());
@@ -205,17 +237,19 @@ public class Player implements GameObject{
      * Schedules a shot for the next frame
      */
     private void shoot(float mx,float my){
-        shotCounter++;
-        double ang=Math.atan2(y-my,x-mx);
-        //ang = -ang;
-        ang+=Math.PI;
-        float dx = (float) (radius*Math.cos(ang)+x);
-        float dy = (float) (radius*Math.sin(ang)+y);
-        float dvx = (float) (bulletSpeed*Math.cos(ang));
-        float dvy = (float) (bulletSpeed*Math.sin(ang));
-        nextShot = new Bullet(dx,dy,dvx,dvy,bulletRadius,bulletGravity);
-        vx -= (recoilSpeed*Math.cos(ang));
-        vy -= (recoilSpeed*Math.sin(ang));
+        if(alive) {
+            shotCounter++;
+            double ang = Math.atan2(y - my, x - mx);
+            //ang = -ang;
+            ang += Math.PI;
+            float dx = (float) (radius * Math.cos(ang) + x);
+            float dy = (float) (radius * Math.sin(ang) + y);
+            float dvx = (float) (bulletSpeed * Math.cos(ang));
+            float dvy = (float) (bulletSpeed * Math.sin(ang));
+            bullets.add(new Bullet(dx, dy, dvx, dvy, bulletRadius, bulletGravity));
+            vx -= (recoilSpeed * Math.cos(ang));
+            vy -= (recoilSpeed * Math.sin(ang));
+        }
     }
 
     public boolean getAlive() {
@@ -248,5 +282,9 @@ public class Player implements GameObject{
 
     public boolean getBulletsKill() {
         return bulletsKill;
+    }
+
+    public void setBullets(ArrayList<Bullet> bullets) {
+        this.bullets = bullets;
     }
 }

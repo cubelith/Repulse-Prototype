@@ -52,7 +52,7 @@ public class GMBouncer implements GameMode {
 
         bulletLifetime = (float)0.75;      //TEMP
         player = new Player(Constants.screenWidth/2,Constants.screenHeight/2,22*unit,25,0*unit,wallsKill,bulletsKill);              //TEMP i to bardzo
-        player.setShotParams(5*unit,10*unit,7*unit,0*unit);        //TEMP i to bardzo
+        player.setShotParams(bullets,5*unit,10*unit,7*unit,0*unit);        //TEMP i to bardzo
         resetMatch();
     }
     @Deprecated
@@ -66,8 +66,10 @@ public class GMBouncer implements GameMode {
 
         bulletLifetime = (float)0.75;      //TEMP
         this.player=player;
+
         bullets=new ArrayList<Bullet>();
         //bullets.add(new Bullet());
+        player.setBullets(bullets);
 
         bulletsShot=0;
     }
@@ -79,12 +81,20 @@ public class GMBouncer implements GameMode {
         //System.out.println("UNIT: "+unit);
                              //TEMP
         lastScore=getScore();
+
+        try {  ///temp
+            bullets.clear();
+        }catch (NullPointerException e){
+            bullets=new ArrayList<Bullet>();
+            player.setBullets(bullets);
+        }
+
         player.reset((gameField.left+gameField.right)/2,(gameField.top+gameField.bottom)/2);
 
 
 
 
-        bullets=new ArrayList<Bullet>();
+
         //bullets.add(new Bullet());
 
         bulletsShot=0;
@@ -109,7 +119,7 @@ public class GMBouncer implements GameMode {
         for(Bullet bullet:bullets) {
             bullet.affect();
         }
-        player.affect(bullets);
+        player.affect();
 
         for(Bullet bullet:bullets) {
             bullet.update();
@@ -178,6 +188,11 @@ public class GMBouncer implements GameMode {
     @Override
     public int getLastScore() {
         return lastScore;
+    }
+
+    @Override
+    public Player getPlayer() {
+        return player;
     }
 
 

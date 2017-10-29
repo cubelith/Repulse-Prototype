@@ -44,4 +44,7 @@ public interface GameMode {
 
     @Deprecated ///temp
     int getLastScore();
+
+    @Deprecated
+    Player getPlayer();
 }
