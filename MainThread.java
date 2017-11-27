@@ -8,6 +8,7 @@ import android.view.SurfaceHolder;
 /**
  * Created by Kuba on 2017-09-27.
  */
+
 public class MainThread extends Thread {
     public static int frames;
     public static final int MAX_FPS = 30;

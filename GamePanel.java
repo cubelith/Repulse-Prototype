@@ -56,7 +56,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         t=(int) (Constants.screenHeight/(sliders.length*2.0+1.0));     //heuraMenu (temp)
         w=Constants.screenWidth;     //heuraMenu (temp)
         //here be setup
-        DataBank.setUnit((float)((Constants.screenWidth+Constants.screenHeight)/(2000.0)));                    //TEMP
+        DataBank.setUnit((float)(Math.sqrt((Constants.screenWidth*Constants.screenHeight)/(720.0*1280))));                    //TEMP
         DataBank.setGameField(new Rect(0,t,Constants.screenWidth,Constants.screenHeight)); //TEMP
         state=STATE_PLAYING;                                            //TEMP
 
