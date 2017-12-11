@@ -25,29 +25,52 @@ public class MainActivity extends Activity {
 
 
     View decorView;
+    GamePanel panel;
     //@Override
     protected void onCreate(Bundle savedInstanceState) {
-        //System.out.println("MainActivity started");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
         decorView = getWindow().getDecorView();
-
         onWindowFocusChanged(true);
+        generateScreenSize();
+        panel=new GamePanel(this);
 
-            generateScreenSize();
+        /*setContentView(R.layout.activity_main);
+        decorView = getWindow().getDecorView();
+        onWindowFocusChanged(true);
+        generateScreenSize();
+        setContentView(new GamePanel(this));*/
+    }
+
+    public void onStart(){
+        super.onStart();
+
+    }
 
 
+    public void onPause(){
+        super.onPause();
+        //finish();
+    }
 
-        //System.out.println("MainActivity 2");
-        setContentView(new GamePanel(this));
-        //System.out.println("MainActivity ended");
+    public void onStop(){
+        super.onStop();
+        //these two lines are ugly and should be replaced
+        int pid = android.os.Process.myPid();
+        android.os.Process.killProcess(pid);
+    }
+
+    public void onRestart(){
+        super.onRestart();
     }
 
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
+        //setContentView(new GamePanel(this));
+        //onCreate()
+        setContentView(panel);
 
     }
 
