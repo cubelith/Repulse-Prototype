@@ -1,12 +1,15 @@
 package com.example.kuba.repulsev001;
 
 import android.graphics.Canvas;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 /**
- * Created by Kuba on 2017-09-27.
+ * This probably launches the whole game, do not remove or change anything.
+ * We will probably have to add more constants to be generated here, but for now do not touch.
+ * Seriously, this works, so stay away.
  */
 
 public class MainThread extends Thread {
@@ -48,7 +51,7 @@ public class MainThread extends Thread {
                 synchronized (surfaceHolder){
                     this.gamePanel.update();
                     this.gamePanel.draw(canvas);
-
+                   // System.out.println("working");
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -78,7 +81,7 @@ public class MainThread extends Thread {
                 averageFPS = 1000/((totalTime/frameCount)/1000000);
                 frameCount = 0;
                 totalTime = 0;
-                //System.out.println(averageFPS);
+                System.out.println("fps: "+averageFPS);
             }
             frames=frameCount;
         }

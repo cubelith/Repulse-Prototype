@@ -1,5 +1,7 @@
 package com.example.kuba.repulsev001;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,30 +10,30 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 
 /**
- * here be javadoc
+ * A simple bullet
  */
 
-public class Bullet implements GameObjectCircle {
+public class Bullet extends GameEntityCircle {
 
-    /**
-     * Says whether the bullet actually exists
-     */
-    private boolean alive;
 
-    private float x,y,vx,vy;
-    private float radius;
-
-    private float gravity;
 
     private Rect gameField;
 
+    /**
+     * True for the bullet next to disappear
+     */
     private boolean dying;
 
     /**
-     * If true, the bullet doesn't kill the player.
+     * If true, the bullet shouldn't kill the player.
      * Stays true until the bullet gets outside of the player for the first time.
      */
     private boolean inPlayer;
+
+    /**
+     * Animates the bullet, should be upgraded slightly soon
+     */
+    private static Animation tempAnimation,tempDecay;
 
     /**
      * Initialises a non-existent bullet
@@ -48,9 +50,32 @@ public class Bullet implements GameObjectCircle {
         this.vx=vx;
         this.vy=vy;
         this.radius=radius;
-        this.gravity=gravity;
+        this.gravityY=gravity;
         gameField=DataBank.getGameField();
         dying=false;
+
+        //loading the pictures for our temporary animations
+        BitmapFactory bf = new BitmapFactory();
+
+        Bitmap[] tempAnim = new Bitmap[5];
+        tempAnim[0] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempanimation_0);
+        tempAnim[1] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempanimation_1);
+        tempAnim[2] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempanimation_2);
+        tempAnim[3] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempanimation_3);
+        tempAnim[4] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempanimation_4);
+
+        tempAnimation = new Animation(tempAnim,0.1f);
+        tempAnimation.play();
+
+        Bitmap[] tempDec = new Bitmap[5];
+        tempDec[0] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempdecay_0);
+        tempDec[1] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempdecay_1);
+        tempDec[2] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempdecay_2);
+        tempDec[3] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempdecay_3);
+        tempDec[4] = bf.decodeResource(Constants.CURRENT_CONTEXT.getResources(),R.drawable.bullet_tempdecay_4);
+
+        tempDecay = new Animation(tempDec,0.1f);
+        tempDecay.play();
     }
 
     /**
@@ -59,8 +84,8 @@ public class Bullet implements GameObjectCircle {
      * @param canvas
      */
     @Override
-    public void draw(Canvas canvas) {
-        Paint paint = new Paint();
+    public void draw(Canvas canvas, float timeScale) {
+        /*Paint paint = new Paint();
 
         if(dying){
             paint.setColor(Color.rgb(255, 63, 0));
@@ -68,15 +93,23 @@ public class Bullet implements GameObjectCircle {
         else {
             paint.setColor(Color.rgb(255, 191, 0));
         }
-        canvas.drawCircle(x,y,radius,paint);
+        canvas.drawCircle(x,y,radius,paint);*/
+        if(dying){
+            tempDecay.update();
+            tempDecay.draw(canvas, new Rect((int) (x - radius), (int) (y - radius), (int) (x + radius), (int) (y + radius)));
+        }
+        else {
+            tempAnimation.update();
+            tempAnimation.draw(canvas, new Rect((int) (x - radius), (int) (y - radius), (int) (x + radius), (int) (y + radius)));
+        }
     }
 
     /**
      * Applies all kinds of effects, such as gravity or bullet collisions
      * Use before <code>update()</code>
      */
-    public void affect(){
-        vy += gravity;
+    public void affect(float timeScale){
+        vy += gravityY;
     }
 
     /**
@@ -84,7 +117,7 @@ public class Bullet implements GameObjectCircle {
      * Returns true if alive
      */
     @Override
-    public void update() {
+    public void update(float timeScale) {
         x+=vx;
         y+=vy;
         while(x-radius<=gameField.left || x+radius>=gameField.right){

@@ -8,7 +8,7 @@ import android.graphics.Rect;
 
 
 /**
- *      heuraMenu (temp)
+ * A temporary slider
  */
 
 public class HeuraSlider {

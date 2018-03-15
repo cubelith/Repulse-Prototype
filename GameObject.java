@@ -13,20 +13,43 @@ public interface GameObject {
 
     /**
      * Draws the object on a given Canvas
-     *
+     * Deprecated, since it does not allow for time scaling.
      * @param canvas   the Canvas to draw on
      */
-    public void draw(Canvas canvas);
+    /*@Deprecated
+    public void draw(Canvas canvas);*/
+
+    /**
+     * Draws the object on a given Canvas, with the given time scaling
+     * @param canvas   the Canvas to draw on
+     */
+    public void draw(Canvas canvas,float timeScale);
 
 
     /**
-     * Updates the object's state by one frame
+     * Updates the object's state by one frame.
+     * Deprecated, since it does not allow for time scaling.
      */
-    public void update();
+    /*@Deprecated
+    public void update();*/
+
+    /**
+     * Updates the object's state by one frame, with the given time scaling
+     */
+    public void update(float timeScale);
+
+    /**
+     * Checks whether the object is alive (exists)
+     */
+    public boolean isAlive();
 
 
 
-    float getVx();
+    //float getVx();
 
-    float getVy();
+    //float getVy();
+
+    //float getGx();
+
+    //float getGy();
 }

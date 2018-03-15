@@ -17,8 +17,6 @@ public interface GameMode {
 
     /**
      * Draws the match on the canvas
-     *
-     * @param canvas   the canvas to draw on
      */
     public void draw(Canvas canvas);
 
@@ -47,4 +45,6 @@ public interface GameMode {
 
     @Deprecated
     Player getPlayer();
+
+    void setRecoilScaling(float f);
 }

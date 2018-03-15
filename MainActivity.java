@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;
+import android.support.annotation.*;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -20,6 +21,7 @@ import java.lang.reflect.Method;
 /**
  * This probably launches the whole game, do not remove or change anything.
  * We will probably have to add more constants to be generated here, but for now do not touch.
+ * Seriously, this works, so stay away.
  */
 public class MainActivity extends Activity {
 
@@ -48,30 +50,44 @@ public class MainActivity extends Activity {
 
     }
 
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
 
     public void onPause(){
         super.onPause();
-        //finish();
+        panel.pause();
+        System.out.println("pauseExecuted");
     }
 
     public void onStop(){
         super.onStop();
+        System.out.println("stopExecuted");
+        //finish();
         //these two lines are ugly and should be replaced
-        int pid = android.os.Process.myPid();
-        android.os.Process.killProcess(pid);
+        /*int pid = android.os.Process.myPid();
+        android.os.Process.killProcess(pid);*/
     }
 
     public void onRestart(){
+        System.out.println("restartBegun");
         super.onRestart();
+        System.out.println("restartExecuted");
     }
 
     @Override
     public void onResume() {
+        System.out.println("resumeBegun");
         super.onResume();  // Always call the superclass method first
+        System.out.println("resumeStarted");
         //setContentView(new GamePanel(this));
         //onCreate()
         setContentView(panel);
-
+        onWindowFocusChanged(true);
+        //panel=new GamePanel(this);
+        panel.resume();
+        System.out.println("resumeExecuted");
     }
 
     public void generateScreenSize(){
